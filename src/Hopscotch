@@ -1,0 +1,55 @@
+package practice1;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class Hopscotch {
+	private static final int COLUMNS = 4;
+	private static int ROWS = 0;
+	private static int[][] dataArray = new int[4][400];
+	private static int result = 0;
+			
+	public static void main(String args[]) throws FileNotFoundException {
+		System.setIn(new FileInputStream("src\\practice1\\input.txt"));
+		Scanner sc = new Scanner(System.in);
+		
+		ROWS = sc.nextInt();
+				
+		// data input start
+		int score = 0;
+		for(int i = 0; i < ROWS; i++) {
+			for(int j = 0; j < COLUMNS; j++) {
+				score = sc.nextInt();
+				System.out.println(String.format("[%s, %s] : %s ", i, j, score));
+				dataArray[i][j] = score;
+			}
+		}
+		//data input end
+		
+		result = getPossibleMax(0, -1);
+		
+		System.out.println(String.format("MAX : %d", result));
+		
+	}
+	
+	public static int getPossibleMax(int targetX, int prohibitedY) {
+		
+		if(targetX >= ROWS) return 0;
+		
+		int max = 0;
+		int possibleMax = 0;
+		
+		for(int i = 0; i < COLUMNS; i++) {
+			if(prohibitedY >= 0 && prohibitedY == i) continue;
+			possibleMax = dataArray[targetX][i]+ getPossibleMax(targetX + 1, i);
+			
+			if(possibleMax > max) {
+				max = possibleMax;
+				
+			}
+		}
+		
+		return max;
+	}
+}
