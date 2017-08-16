@@ -2,13 +2,16 @@ package practice1;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class Hopscotch {
 	private static final int COLUMNS = 4;
 	private static int ROWS = 0;
-	private static int[][] dataArray = new int[4][400];
+	private static int[][] dataArray = new int[400][4];
 	private static int result = 0;
+	private static HashMap<Integer, Integer[]> largestTwoMap = new HashMap();
 			
 	public static void main(String args[]) throws FileNotFoundException {
 		System.setIn(new FileInputStream("src\\practice1\\input.txt"));
@@ -21,7 +24,6 @@ public class Hopscotch {
 		for(int i = 0; i < ROWS; i++) {
 			for(int j = 0; j < COLUMNS; j++) {
 				score = sc.nextInt();
-				System.out.println(String.format("[%s, %s] : %s ", i, j, score));
 				dataArray[i][j] = score;
 			}
 		}
@@ -39,9 +41,11 @@ public class Hopscotch {
 		
 		int max = 0;
 		int possibleMax = 0;
-		
-		for(int i = 0; i < COLUMNS; i++) {
+		Integer[] largestTwo = getLargestTwoIdices2(targetX);
+				
+		for(Integer i : largestTwo) {
 			if(prohibitedY >= 0 && prohibitedY == i) continue;
+			
 			possibleMax = dataArray[targetX][i]+ getPossibleMax(targetX + 1, i);
 			
 			if(possibleMax > max) {
@@ -52,4 +56,72 @@ public class Hopscotch {
 		
 		return max;
 	}
+	
+	public static Integer[] getLargestTwoIdices(int targetX) {
+		
+		if(largestTwoMap.containsKey(targetX)) return largestTwoMap.get(targetX);
+		
+		Integer[] result = new Integer[2];
+		int[] targetArray = dataArray[targetX];
+		int candidate = 0;
+		int temp = 0;
+		int largestIdx = -1;
+		int secondLargestIdx = -1;
+		
+		for(int i = 0; i < targetArray.length; i++) {
+			candidate = targetArray[i];
+			temp = 0;
+			
+			if(largestIdx < 0 || targetArray[largestIdx] <= candidate){
+				temp = largestIdx;
+				largestIdx = i;
+				
+				if(secondLargestIdx < 0 || targetArray[secondLargestIdx] <= targetArray[temp]) {
+					secondLargestIdx = temp;
+				}
+				continue;
+			} 
+			
+			if(secondLargestIdx < 0 || targetArray[secondLargestIdx] < candidate) {
+				secondLargestIdx = i;
+			}
+			
+		}
+		
+		
+		result[0] = largestIdx;
+		result[1] = secondLargestIdx;
+		
+		System.out.println(String.format("%d 's highest two index = [%d, %d]", targetX, result[0], result[1]));
+		largestTwoMap.put(targetX, result);
+		
+		return result;
+		
+	}
+	
+	public static Integer[] getLargestTwoIdices2(int targetX) {
+		
+		if(largestTwoMap.containsKey(targetX)) return largestTwoMap.get(targetX);
+		
+		Integer[] result = new Integer[2];
+		int[] targetArray = dataArray[targetX].clone();
+		HashMap<Integer, Integer> targetMap = new HashMap<Integer, Integer>(4);
+		
+		for(int i = 0; i < targetArray.length; i++) {
+			targetMap.put(targetArray[i], i);
+		}
+		
+		Arrays.sort(targetArray);
+		
+		result[0] = targetMap.get(targetArray[targetArray.length - 1]);
+		result[1] = targetMap.get(targetArray[targetArray.length - 2]);
+		
+		System.out.println(String.format("%d 's highest two index = [%d, %d]", targetX, result[0], result[1]));
+		
+		largestTwoMap.put(targetX, result);
+		
+		return result;
+		
+	}
+	
 }
